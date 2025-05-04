@@ -42,8 +42,8 @@ public class RobotContainer {
     //   ));
     m_swerveSubsystem.setDefaultCommand(
         m_swerveSubsystem.driveCommandF(
-            () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.15),
             () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.15),
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.15),
             () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.15)
         )
     );

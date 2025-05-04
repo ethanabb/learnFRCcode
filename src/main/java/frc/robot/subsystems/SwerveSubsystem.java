@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
-
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
@@ -35,7 +34,8 @@ public class SwerveSubsystem extends SubsystemBase {
     try {
         m_swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(maximumSpeed);
         SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-        m_swerveDrive.resetOdometry(new Pose2d(5, 3, new Rotation2d()));
+        m_swerveDrive.resetOdometry(new Pose2d(7, 3, new Rotation2d(0)));
+        m_swerveDrive.zeroGyro();
     } catch (IOException e) {
         File f = new File(swerveJsonDirectory, "swervedrive.json");
         System.out.println("Resolved path: " + f.getAbsolutePath());
@@ -92,15 +92,22 @@ public Command zeroGyro(){
   {
     return run(() -> {
       // Make the robot move
-      Translation2d scaledInputs = SwerveMath.scaleTranslation(new Translation2d(translationX.getAsDouble(),
-      translationY.getAsDouble()), 0.8);
+     
+      //for if robot wants to be slow or fast, you can change values if needed
+      double driveMultiplier = 5.0;
+      double turnMultiplier = 0.05; 
+      
+      Translation2d scaledInputs = new Translation2d(translationX.getAsDouble() * driveMultiplier,
+      translationY.getAsDouble() * driveMultiplier);
+      
 
-      m_swerveDrive.driveFieldOriented(m_swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(), 
-      scaledInputs.getY(),
-      m_swerveDrive.getOdometryHeading().getRadians() + angularRotationX.getAsDouble()*0.05, 
-      m_swerveDrive.getOdometryHeading().getRadians(), 
-      m_swerveDrive.getMaximumChassisVelocity()));
-    });
+          m_swerveDrive.drive(
+            scaledInputs,
+            angularRotationX.getAsDouble() * turnMultiplier * m_swerveDrive.getMaximumChassisAngularVelocity(),
+            true,
+            false
+        );
+    }); 
 
    //OPTIONAL DRIVE COMMAND
       //   m_swerveDrive.drive(new Translation2d(translationX.getAsDouble() * m_swerveDrive.getMaximumChassisVelocity(),
