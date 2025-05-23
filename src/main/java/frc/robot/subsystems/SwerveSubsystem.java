@@ -38,15 +38,12 @@ public class SwerveSubsystem extends SubsystemBase {
         m_swerveDrive.zeroGyro();
     } catch (IOException e) {
         File f = new File(swerveJsonDirectory, "swervedrive.json");
-        System.out.println("Resolved path: " + f.getAbsolutePath());
-        System.out.println("File exists? " + f.exists());
         e.printStackTrace();
         
         // Critical! Re-throw to avoid half-initialized objects
         throw new RuntimeException("Failed to load swerve drive config", e);
     }
 }
-
 public Command zeroGyro(){
   return run (() -> {
     m_swerveDrive.zeroGyro();

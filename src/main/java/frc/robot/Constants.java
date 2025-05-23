@@ -17,4 +17,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kTechControllerPort = 1;
   }
+  public static class ControllerConstants {
+    public static final double uniDeadband = .15;
+  }
 }

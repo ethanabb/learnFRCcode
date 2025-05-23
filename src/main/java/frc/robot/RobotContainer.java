@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.SwerveSubsystem;
 
@@ -22,33 +23,32 @@ import frc.robot.subsystems.SwerveSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Elevator m_Elevator = new Elevator();
-  private SwerveSubsystem m_swerveSubsystem;
+    //Create instance of SwerveSubsystem
+    private final static SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem();
+    //Create an instance of Elevator 
+    private final static Elevator m_Elevator = new Elevator();
+    //Create an instance of Arm
+    private final static Arm m_Arm = new Arm();
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
+  public final static CommandXboxController m_driverController =
       new CommandXboxController(OperatorConstants.kDriverControllerPort);
-  public static CommandXboxController m_techController = 
+  public final static CommandXboxController m_techController = 
       new CommandXboxController(OperatorConstants.kTechControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() { 
-    //Create instance of SwerveSubsystem
-    m_swerveSubsystem = new SwerveSubsystem();
     //sets default drive command
-    // m_swerveSubsystem.setDefaultCommand(
-    //   m_swerveSubsystem.driveCommand(
-    //         () -> MathUtil.applyDeadband(m_driverController.getLeftX(), 0.15),
-    //         () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.15),
-    //         () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.15),
-    //         () -> MathUtil.applyDeadband(-m_driverController.getRightY(), 0.15)
-    //   ));
     m_swerveSubsystem.setDefaultCommand(
         m_swerveSubsystem.driveCommandF(
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.15),
-            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), 0.15),
-            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), 0.15)
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftY(), Constants.ControllerConstants.uniDeadband),
+            () -> MathUtil.applyDeadband(-m_driverController.getLeftX(), Constants.ControllerConstants.uniDeadband),
+            () -> MathUtil.applyDeadband(-m_driverController.getRightX(), Constants.ControllerConstants.uniDeadband)
         )
     );
+    //sets default elevator command
+    m_Elevator.setDefaultCommand(m_Elevator.elevatorRunCommand(MathUtil.applyDeadband(m_techController.getLeftY(), Constants.ControllerConstants.uniDeadband)));
+    //sets default arm command
+    m_Arm.setDefaultCommand(m_Arm.armRunCommand(MathUtil.applyDeadband(m_techController.getRightX(), Constants.ControllerConstants.uniDeadband)));
     // Configure the trigger bindings
     configureBindings();
    
@@ -64,7 +64,6 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_Elevator.setDefaultCommand(m_Elevator.elevatorRunCommand(m_techController.getLeftY()));
     m_driverController.b().whileTrue(m_swerveSubsystem.zeroGyro());
   }
 

@@ -9,18 +9,19 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.pathplanner.lib.commands.FollowPathCommand;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
-  private TalonFX elevatorLeader = new TalonFX(0);
-  private TalonFX elevatorFollower = new TalonFX(1);
-  private Follower follower = new Follower(0, false);
+  private TalonFX elevatorLeader = new TalonFX(10);
+  private TalonFX elevatorFollower = new TalonFX(9);
+  private Follower follower = new Follower(10, false);
   private boolean safeUp;
   private boolean safeDown;
-  private DigitalInput upperLimit = new DigitalInput(0);
-  private DigitalInput lowerLimit = new DigitalInput(1);
-  
+  private DigitalInput upperLimit = new DigitalInput(2);
+  private DigitalInput lowerLimit = new DigitalInput(3);
+  private DutyCycleEncoder elevatorEncoder = new DutyCycleEncoder(0, 360, 0);
   /** Creates a new ExampleSubsystem. */
   public Elevator() {
     elevatorFollower.setControl(follower);
@@ -44,21 +45,25 @@ public class Elevator extends SubsystemBase {
    *
    * @return a command
    */
-  public Command elevatorRunCommand(double controllerValue) {
+  public Command elevatorRunCommand(double leftStickYValue) {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
         () -> {
           evaluateSafe();
-          if(controllerValue < 0 && safeUp){
-            elevatorLeader.set(controllerValue);
-          } else if (controllerValue > 0 && safeDown){
-            elevatorLeader.set(controllerValue);
+          if(leftStickYValue < 0 && safeUp){
+            elevatorLeader.set(leftStickYValue);
+          } else if (leftStickYValue > 0 && safeDown){
+            elevatorLeader.set(leftStickYValue);
           } else {
             elevatorLeader.set(0);
           }
 
         });
+  }
+
+  public void setPosition(double targetPosition){
+    
   }
 
   
@@ -78,7 +83,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    
+
   }
 
   @Override
